@@ -1,5 +1,8 @@
 package com.shubhanshusv.activitymonitor;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -20,8 +23,9 @@ public class Activity_observer extends Activity implements SensorEventListener {
     Sensor accelerometer;
     Sensor magnetometer;
 
-    TextView pitch_, roll_, mild_or, severe_or, path_;
-    TextView movement, shake, ans, minute, counter;
+    //TextView pitch_, roll_, mild_or, severe_or, path_;
+    //TextView movement, shake, ans, minute, counter;
+
 
     float azimut;
 
@@ -40,7 +44,7 @@ public class Activity_observer extends Activity implements SensorEventListener {
     int flag;
     long diff1;
 
-    int min_counter = 0;
+    int min_counter = 1;
 
     private long lastUpdate = 0;                                // stores last time update was made in checking values of shake
     private float last_x, last_y, last_z;                       // stores previous values of acceleration in x,y,z directions
@@ -68,22 +72,29 @@ public class Activity_observer extends Activity implements SensorEventListener {
     int prev_or_severe = 0;                                     // orientation severe flaw data in previous minute
     //Vibrator vibe ;
 
+    ValueAnimator gty = new ValueAnimator();
+    ValueAnimator gtr = new ValueAnimator();
+    ValueAnimator ytg = new ValueAnimator();
+    ValueAnimator ytr = new ValueAnimator();
+    ValueAnimator rty = new ValueAnimator();
+    ValueAnimator rtg = new ValueAnimator();
+
     int path;
     View view;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_observer);    // Register the sensor listeners
-        ans = (TextView) findViewById(R.id.ans);
-        movement = (TextView) findViewById(R.id.movement);
-        shake = (TextView) findViewById(R.id.shake);
-        pitch_ = (TextView) findViewById(R.id.pitch);
-        roll_ = (TextView) findViewById(R.id.roll);
-        path_ = (TextView) findViewById(R.id.with);
-        mild_or = (TextView) findViewById(R.id.mild_or);
-        severe_or = (TextView) findViewById(R.id.severe_or);
-        counter = (TextView) findViewById(R.id.counter1);
-        minute = (TextView) findViewById(R.id.counter2);
+        //ans = (TextView) findViewById(R.id.ans);
+        //movement = (TextView) findViewById(R.id.movement);
+        //shake = (TextView) findViewById(R.id.shake);
+        //pitch_ = (TextView) findViewById(R.id.pitch);
+        //roll_ = (TextView) findViewById(R.id.roll);
+        //path_ = (TextView) findViewById(R.id.with);
+        //mild_or = (TextView) findViewById(R.id.mild_or);
+        //severe_or = (TextView) findViewById(R.id.severe_or);
+        //counter = (TextView) findViewById(R.id.counter1);
+        //minute = (TextView) findViewById(R.id.counter2);
 
         int i;
 
@@ -92,6 +103,94 @@ public class Activity_observer extends Activity implements SensorEventListener {
             or_status[i] = 0;
 
         }
+
+        status[0] = 0;
+        move_status[0] = 0;
+        shake_status[0] = 0;
+
+        // green to yellow
+
+        gty.setIntValues(R.color.green,R.color.yellow);
+        gty.setEvaluator(new ArgbEvaluator());
+        gty.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                view.setBackgroundColor((Integer)animation.getAnimatedValue());
+            }
+        });
+
+        gty.setDuration(4000);
+
+        // green to red
+
+        gtr.setIntValues(R.color.green,R.color.red);
+        gtr.setEvaluator(new ArgbEvaluator());
+        gtr.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                view.setBackgroundColor((Integer)animation.getAnimatedValue());
+            }
+        });
+
+        gtr.setDuration(4000);
+
+        // yellow to green
+
+        ytg.setIntValues(R.color.yellow,R.color.green);
+        ytg.setEvaluator(new ArgbEvaluator());
+        ytg.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                view.setBackgroundColor((Integer)animation.getAnimatedValue());
+            }
+        });
+
+        ytg.setDuration(4000);
+
+        // yellow to red
+
+        ytr.setIntValues(R.color.yellow,R.color.red);
+        ytr.setEvaluator(new ArgbEvaluator());
+        ytr.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                view.setBackgroundColor((Integer)animation.getAnimatedValue());
+            }
+        });
+
+        ytr.setDuration(4000);
+
+        // red to green
+
+        rtg.setIntValues(R.color.red,R.color.green);
+        rtg.setEvaluator(new ArgbEvaluator());
+        rtg.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                view.setBackgroundColor((Integer)animation.getAnimatedValue());
+            }
+        });
+
+        rtg.setDuration(4000);
+
+        // red to yellow
+
+        rty.setIntValues(R.color.red,R.color.yellow);
+        rty.setEvaluator(new ArgbEvaluator());
+        rty.addUpdateListener(new ValueAnimator.AnimatorUpdateListener(){
+
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                view.setBackgroundColor((Integer)animation.getAnimatedValue());
+            }
+        });
+
+        rty.setDuration(4000);
 
         gravity[0] = 0.0f;
         gravity[1] = 0.0f;
@@ -112,16 +211,17 @@ public class Activity_observer extends Activity implements SensorEventListener {
         magnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         view = findViewById(R.id.color);
-        view.setBackgroundColor(Color.GREEN);
+        view.setBackgroundColor(Color.parseColor("#7EF724"));
+        //bgcolor.start();
 
         //vibe = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 
         if (magnetometer == null) {
             path = 1;
-            path_.setText("without");
+            //path_.setText("without");
         } else {
             path = 2;
-            path_.setText("with");
+            //path_.setText("with");
         }
     }
 
@@ -145,9 +245,9 @@ public class Activity_observer extends Activity implements SensorEventListener {
         app_present_time = System.currentTimeMillis() / 1000;
         diff1 = app_present_time - app_start_time;
 
-        minute.setText(String.valueOf(diff1 % 60));
+        //minute.setText(String.valueOf(diff1 % 60));
 
-        if (diff1 % 60 == 0 && flag == 0) {
+        if (diff1 % 60 == 0 && flag == 0 && diff1 != 0) {
 
             prev_movecount = moveCount;
             prev_shakecount = shakeCount;
@@ -182,27 +282,78 @@ public class Activity_observer extends Activity implements SensorEventListener {
 
             mild_flaw += mild_count;
             severe_flaw += strong_count;
-
             total = mild_flaw + 2 * severe_flaw;
 
             if (total < 4) {
 
-                ans.setText("Focus");
-                view.setBackgroundColor(Color.GREEN);
+                // This was for the smooth transition of colours
+
+//                if(status[min_counter-1] == 1){
+//
+//                    ytg.start();
+//                    view.setBackgroundColor(Color.parseColor("#7EF724"));
+//
+//                }else if(status[min_counter-1] == 2){
+//
+//                    rtg.start();
+//                    view.setBackgroundColor(Color.parseColor("#7EF724"));
+//
+//                }else{
+//
+//                    view.setBackgroundColor(Color.parseColor("#7EF724"));
+//
+//                }
+
+                //ans.setText("Good job, Keep Concentrating");
+                view.setBackgroundColor(Color.parseColor("#7EF724"));
                 status[min_counter] = 0;
 
+            }else if (total >= 4 && total <= 6){
 
-            } else if (total >= 4 && total <= 6) {
+                // This was for the smooth transition of colours
 
+//                if(status[min_counter-1] == 0){
+//
+//                    gty.start();
+//                    view.setBackgroundColor(Color.parseColor("#EEF724"));
+//
+//                }else if(status[min_counter-1] == 1){
+//
+//                    rty.start();
+//                    view.setBackgroundColor(Color.parseColor("#EEF724"));
+//
+//                }else{
+//
+//                    view.setBackgroundColor(Color.parseColor("#EEF724"));
+//
+//                }
 
-                ans.setText("Mild");
-                view.setBackgroundColor(Color.YELLOW);
+                //ans.setText("Hey maintain focus");
+                view.setBackgroundColor(Color.parseColor("#EEF724"));
                 status[min_counter] = 1;
 
-            } else {
+            }else{
 
-                ans.setText("Severe");
-                view.setBackgroundColor(Color.RED);
+                // This was for the smooth transition of colours
+
+                //ans.setText("Warning! Not at all focused");
+//                if(status[min_counter-1] == 0){
+//
+//                    gtr.start();
+//                    view.setBackgroundColor(Color.parseColor("#F73124"));
+//
+//                }else if(status[min_counter-1] == 1){
+//
+//                    ytr.start();
+//                    view.setBackgroundColor(Color.parseColor("#F73124"));
+//
+//                }else{
+//
+//                    view.setBackgroundColor(Color.parseColor("#F73124"));
+//
+//                }
+
+                view.setBackgroundColor(Color.parseColor("#F73124"));
                 status[min_counter] = 2;
 
             }
@@ -225,12 +376,11 @@ public class Activity_observer extends Activity implements SensorEventListener {
 
         if (path == 1) {
 
-            path_.setText("Without");
+            //path_.setText("Without");
 
             final float alpha = 0.3f;
 
-            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
 
                 mAccelerometerReading[0] = event.values[0];
                 mAccelerometerReading[1] = event.values[1];
@@ -248,14 +398,14 @@ public class Activity_observer extends Activity implements SensorEventListener {
                 pitch = pitch * 180 * 7 / 22;
                 roll = roll * 180 * 7 / 22;
 
-                pitch_.setText(String.valueOf(pitch));
-                roll_.setText(String.valueOf(roll));
+                //pitch_.setText(String.valueOf(pitch));
+                //roll_.setText(String.valueOf(roll));
 
             }
 
         } else {
 
-            path_.setText("With");
+            // path_.setText("With");
             // Obtaining readings from accelerometer and magnetometer
 
             if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -277,10 +427,10 @@ public class Activity_observer extends Activity implements SensorEventListener {
         }
 
         shake_n_movement_data(mAccelerometerReading[0], mAccelerometerReading[1], mAccelerometerReading[2], lastUpdate, shakeCount, moveCount);
-        movement.setText(String.valueOf(moveCount));
-        shake.setText(String.valueOf(shakeCount));
-        pitch_.setText(String.valueOf(pitch));
-        roll_.setText(String.valueOf(roll));
+        //movement.setText(String.valueOf(moveCount));
+        //shake.setText(String.valueOf(shakeCount));
+        //pitch_.setText(String.valueOf(pitch));
+        //roll_.setText(String.valueOf(roll));
         int screen_orientation = this.getResources().getConfiguration().orientation;
 
         if (screen_orientation == 2) {
@@ -299,7 +449,7 @@ public class Activity_observer extends Activity implements SensorEventListener {
 
                     mild_count++;
                     or_status[min_counter] = 1;
-                    mild_or.setText(String.valueOf(mild_count));
+                    //mild_or.setText(String.valueOf(mild_count));
                     flag_c = 1;
 
                 }
@@ -308,7 +458,7 @@ public class Activity_observer extends Activity implements SensorEventListener {
 
                     strong_count++;
                     or_status[min_counter] = 2;
-                    severe_or.setText(String.valueOf(strong_count));
+                    //severe_or.setText(String.valueOf(strong_count));
                     flag_c = 2;
 
                 }
@@ -317,7 +467,7 @@ public class Activity_observer extends Activity implements SensorEventListener {
 
                     strong_count += 3;
                     or_status[min_counter] = 3;
-                    severe_or.setText(String.valueOf(strong_count));
+                    //severe_or.setText(String.valueOf(strong_count));
                     flag_c = 3;
 
                 }
@@ -332,7 +482,7 @@ public class Activity_observer extends Activity implements SensorEventListener {
                 }
 
             }
-            counter.setText(String.valueOf(diff));
+            //counter.setText(String.valueOf(diff));
 
 
         } else {
@@ -351,7 +501,7 @@ public class Activity_observer extends Activity implements SensorEventListener {
 
                     mild_count++;
                     or_status[min_counter] = 1;
-                    mild_or.setText(String.valueOf(mild_count));
+                    //mild_or.setText(String.valueOf(mild_count));
                     flag_c = 1;
 
                 }
@@ -360,7 +510,7 @@ public class Activity_observer extends Activity implements SensorEventListener {
 
                     strong_count++;
                     or_status[min_counter] = 2;
-                    severe_or.setText(String.valueOf(strong_count));
+                    //severe_or.setText(String.valueOf(strong_count));
                     flag_c = 2;
 
                 }
@@ -369,7 +519,7 @@ public class Activity_observer extends Activity implements SensorEventListener {
 
                     strong_count += 3;
                     or_status[min_counter] = 3;
-                    severe_or.setText(String.valueOf(strong_count));
+                    //severe_or.setText(String.valueOf(strong_count));
                     flag_c = 3;
 
                 }
@@ -384,7 +534,7 @@ public class Activity_observer extends Activity implements SensorEventListener {
                 }
 
             }
-            counter.setText(String.valueOf(diff));
+            //counter.setText(String.valueOf(diff));
         }
     }
 

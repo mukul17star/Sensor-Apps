@@ -37,7 +37,7 @@ public class Report extends AppCompatActivity {
 
         title.setTypeface(fonttype);
 
-        for(int i=0;i<minutes;i++){
+        for(int i=0;i<minutes-1;i++){
 
             TableRow tr1 = new TableRow(this);
             TableRow tr2 = new TableRow(this);
@@ -115,7 +115,7 @@ public class Report extends AppCompatActivity {
 
             }else if(or_status[i+1] == 2){
 
-                c8.setText("Out of orientation several times");
+                c8.setText("Disturbed several times");
 
             }else{
 
